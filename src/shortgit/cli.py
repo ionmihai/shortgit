@@ -1,23 +1,20 @@
 # src/shortgit/cli.py
-import shutil, subprocess
+import shutil
+import subprocess
 from pathlib import Path
 from typing import Optional
 from enum import Enum
 import typer
 
-def _load_help_text() -> str:
-    # Look for CLI_REFERENCE.md next to this file, then project root fallback
-    here = Path(__file__).resolve().parent
-    candidates = [
-        here / "CLI_REFERENCE.md",
-        here.parent.parent / "CLI_REFERENCE.md",  # project root if installed editable
-    ]
-    for p in candidates:
-        if p.exists():
-            return p.read_text(encoding="utf-8")
-    return "shortgit: initialize and push Git/GitHub repositories.\n\nRun 'shortgit init --help' or 'shortgit push --help' for options."
+HELP_TEXT = """\
+shortgit: initialize and push Git/GitHub repositories.
 
-HELP_TEXT = _load_help_text()
+Commands:
+  init   Initialize a new GitHub repository with sensible defaults
+  push   Stage, commit, and push all changes to the remote
+
+Run 'shortgit init --help' or 'shortgit push --help' for command-specific options.
+"""
 
 app = typer.Typer(add_completion=False, help=HELP_TEXT)
 
