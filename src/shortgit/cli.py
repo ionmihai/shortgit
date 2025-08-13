@@ -6,17 +6,17 @@ from typing import Optional
 from enum import Enum
 import typer
 
-HELP_TEXT = """\
-shortgit: initialize and push Git/GitHub repositories.
+HELP_TEXT = (
+    "shortgit — initialize and push Git/GitHub repositories.\n\n"
+    "\b\n"  # <— tells Click/Typer: keep the following block as-is
+    "Commands:\n"
+    "  init    Initialize a new GitHub repository with sensible defaults\n"
+    "  push    Stage, commit, and push all changes to the remote\n"
+    "\n"
+    "Run 'shortgit init --help' or 'shortgit push --help' for command-specific options.\n"
+)
 
-Commands:
-  init   Initialize a new GitHub repository with sensible defaults
-  push   Stage, commit, and push all changes to the remote
-
-Run 'shortgit init --help' or 'shortgit push --help' for command-specific options.
-"""
-
-app = typer.Typer(add_completion=False, help=HELP_TEXT)
+app = typer.Typer(add_completion=False, help=HELP_TEXT, context_settings={"max_content_width": None})
 
 class Visibility(str, Enum):
     public = "public"
