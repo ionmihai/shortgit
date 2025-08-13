@@ -22,6 +22,7 @@ dist/
 *.pkl
 *.pkl.zip
 *.pickle
+*.pickle.zip
 *.csv
 *.tsv
 *.txt
