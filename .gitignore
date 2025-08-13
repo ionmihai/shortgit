@@ -20,6 +20,7 @@ dist/
 *.pq
 *.feather
 *.pkl
+*.pkl.zip
 *.pickle
 *.csv
 *.tsv
