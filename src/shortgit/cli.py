@@ -1,11 +1,25 @@
-import shutil
-import subprocess
+# src/shortgit/cli.py
+import shutil, subprocess
 from pathlib import Path
 from typing import Optional
 from enum import Enum
 import typer
 
-app = typer.Typer(add_completion=False)
+def _load_help_text() -> str:
+    # Look for CLI_REFERENCE.md next to this file, then project root fallback
+    here = Path(__file__).resolve().parent
+    candidates = [
+        here / "CLI_REFERENCE.md",
+        here.parent.parent / "CLI_REFERENCE.md",  # project root if installed editable
+    ]
+    for p in candidates:
+        if p.exists():
+            return p.read_text(encoding="utf-8")
+    return "shortgit: initialize and push Git/GitHub repositories.\n\nRun 'shortgit init --help' or 'shortgit push --help' for options."
+
+HELP_TEXT = _load_help_text()
+
+app = typer.Typer(add_completion=False, help=HELP_TEXT)
 
 class Visibility(str, Enum):
     public = "public"
@@ -33,22 +47,18 @@ def make_gitignore(repo_dir: Path, also_ignore_data_exts: bool=True, extra_patte
         "build/", "dist/",
         "# IDE",
         ".idea/", ".vscode/",
+        "# Data directories",
+        "**/data/**",
+        "# Common data files",
+        "*.parquet","*.pq","*.feather","*.pkl","*.pickle",
+        "*.csv","*.tsv","*.txt","*.jsonl","*.json",
+        "*.dta","*.sas7bdat","*.xpt","*.sav","*.zsav",
+        "*.rds","*.RData",
+        "*.xlsx","*.xls","*.xlsm","*.xlsb",
+        "*.h5","*.hdf5",
+        "*.npz","*.npy",
     ]
-    if also_ignore_data_exts:
-        lines += [
-            "# Data directories",
-            "**/data/**",
-            "# Common data files",
-            "*.parquet","*.pq","*.feather","*.pkl","*.pickle",
-            "*.csv","*.tsv","*.txt","*.jsonl","*.json",
-            "*.dta","*.sas7bdat","*.xpt","*.sav","*.zsav",
-            "*.rds","*.RData",
-            "*.xlsx","*.xls","*.xlsm","*.xlsb",
-            "*.h5","*.hdf5",
-            "*.npz","*.npy",
-        ]
-    if extra_patterns:
-        lines += extra_patterns
+    if extra_patterns: lines += extra_patterns
     gi.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 def git_init(repo_dir: Path, branch: str):
@@ -81,14 +91,11 @@ def init(
     if (path/".git").exists() and not force_reinit:
         raise RuntimeError(f"{path} already has a .git directory. Use --force to re-init.")
 
-    # .gitignore
     if create_gitignore:
         make_gitignore(path, also_ignore_data_exts=ignore_data_exts)
 
-    # init local repo
     git_init(path, default_branch)
     run(["git","add","-A"], cwd=path)
-    # commit even if empty to establish branch
     try:
         status = run(["git","status","--porcelain"], cwd=path)
         if status.strip():
@@ -98,7 +105,6 @@ def init(
     except RuntimeError as e:
         raise RuntimeError(f"git commit failed: {e}") from e
 
-    # gh auth + remote create (ALWAYS remote)
     try:
         run(["gh","auth","status"])
     except RuntimeError as e:
@@ -106,21 +112,17 @@ def init(
 
     repo_name = name or path.name
     args = ["gh","repo","create",repo_name,"--source",str(path),"--remote","origin"]
-    # visibility flags
-    if visibility=="public": args += ["--public"]
-    elif visibility=="private": args += ["--private"]
+    if visibility is Visibility.public: args += ["--public"]
+    elif visibility is Visibility.private: args += ["--private"]
     else: args += ["--internal"]
     if description: args += ["--description", description]
     if org: args += ["--owner", org]
-    # IMPORTANT: we do NOT push here (separation of concerns)
     run(args, cwd=path)
 
     typer.echo(f'Initialized repo at {path} on branch "{default_branch}".')
-    if org:
-        typer.echo(f"Created GitHub repo: {org}/{repo_name} (visibility: {visibility})")
-    else:
-        typer.echo(f"Created GitHub repo: {repo_name} (visibility: {visibility})")
-    typer.echo('Next step: run `shortgit push "your first commit message"` to push.')
+    if org: typer.echo(f"Created GitHub repo: {org}/{repo_name} (visibility: {visibility.value})")
+    else:   typer.echo(f"Created GitHub repo: {repo_name} (visibility: {visibility.value})")
+    typer.echo('Next step: run `shortgit push \"your first commit message\"` to push.')
 
 @app.command()
 def push(
@@ -149,14 +151,12 @@ def push(
         else:
             raise
 
-    # ensure origin exists
     try:
         run(["git","remote","get-url","origin"], cwd=path)
     except RuntimeError:
         raise RuntimeError("No 'origin' remote configured. Run `shortgit init` or add a remote manually.")
 
     br = branch or current_branch(path)
-    # try push with upstream if requested; if it fails because upstream exists, fall back to normal push
     try:
         if set_upstream:
             run(["git","push","-u","origin",br], cwd=path)
