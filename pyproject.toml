@@ -1,0 +1,16 @@
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[project]
+name = "shortgit"
+version = "0.1.0"
+description = "A tiny, opinionated Git/GitHub bootstrapper with 'init' and 'push'."
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [{name = "You"}]
+dependencies = ["typer>=0.12"]
+
+[project.scripts]
+shortgit = "shortgit.cli:main"
