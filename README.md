@@ -77,7 +77,8 @@ This will:
 ```bash
 mkdir myproject && cd myproject
 touch README.md
-shortgit init "myproject"
+#...create github repo named "myproject"...
+shortgit init .
 # ...make changes...
 shortgit push "add initial code"
 ```
