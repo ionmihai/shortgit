@@ -48,22 +48,11 @@ shortgit push "initial structure"
 
 ## CLI Reference
 
-> The full command reference is maintained in `CLI_REFERENCE.md`. Depending on your documentation tooling, you can include it directly below. We add common include directives so most toolchains will work out of the box; GitHub will simply show a link.
+> The full command reference is maintained in `CLI_REFERENCE.md`. 
 
 **Direct link:** [CLI\_REFERENCE.md](CLI_REFERENCE.md)
 
-### Include (choose one supported by your docs tool)
 
-<!-- MyST / Sphinx / MkDocs (myst-parser) -->
-
-```{include} CLI_REFERENCE.md
-```
-
-<!-- MkDocs-Macros or markdown-include plugin (if enabled) -->
-
-<!-- @include: ./CLI_REFERENCE.md -->
-
-<!-- GitHub Markdown does not support includes; the link above will suffice on GitHub. -->
 
 ---
 
