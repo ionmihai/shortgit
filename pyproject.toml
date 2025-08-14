@@ -12,5 +12,8 @@ license = {text = "MIT"}
 authors = [{name = "You"}]
 dependencies = ["typer>=0.12"]
 
+[tool.hatch.build.targets.wheel]
+packages = ["src/shortgit"]
+
 [project.scripts]
 shortgit = "shortgit.cli:main"
