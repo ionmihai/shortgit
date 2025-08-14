@@ -8,8 +8,8 @@ version = "0.1.0"
 description = "A tiny, opinionated Git/GitHub bootstrapper with 'init' and 'push'."
 readme = "README.md"
 requires-python = ">=3.9"
-license = {text = "MIT"}
-authors = [{name = "You"}]
+license = { file = "LICENSE" }
+authors = [{name = "Mihai Ion"}]
 dependencies = ["typer>=0.12"]
 
 [tool.hatch.build.targets.wheel]
