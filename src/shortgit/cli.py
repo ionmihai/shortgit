@@ -35,7 +35,9 @@ def ensure_tool(name: str, url: str):
 
 def make_gitignore(repo_dir: Path, also_ignore_data_exts: bool=True, extra_patterns: Optional[list[str]]=None):
     gi = repo_dir / ".gitignore"
-    if gi.exists(): return
+    if gi.exists(): 
+        return
+        
     lines = [
         "# Python",
         "__pycache__/", "*.py[cod]", "*.egg-info/", ".pytest_cache/", ".mypy_cache/", ".ruff_cache/",
@@ -49,7 +51,8 @@ def make_gitignore(repo_dir: Path, also_ignore_data_exts: bool=True, extra_patte
         "# Common data files",
         "*.parquet",
     ]
-    if extra_patterns: lines += extra_patterns
+    if extra_patterns: 
+        lines += extra_patterns
     gi.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 def git_init(repo_dir: Path, branch: str):
@@ -103,13 +106,17 @@ def init(
 
     repo_name = name or path.name
     args = ["gh","repo","create",repo_name,"--source",str(path),"--remote","origin", f"--{visibility}"]
-    if description: args += ["--description", description]
-    if org: args += ["--owner", org]
+    if description: 
+        args += ["--description", description]
+    if org: 
+        args += ["--owner", org]
     run(args, cwd=path)
 
     typer.echo(f'Initialized repo at {path} on branch "{default_branch}".')
-    if org: typer.echo(f"Created GitHub repo: {org}/{repo_name} (visibility: {visibility.value})")
-    else:   typer.echo(f"Created GitHub repo: {repo_name} (visibility: {visibility.value})")
+    if org: 
+        typer.echo(f"Created GitHub repo: {org}/{repo_name} (visibility: {visibility.value})")
+    else:   
+        typer.echo(f"Created GitHub repo: {repo_name} (visibility: {visibility.value})")
     typer.echo('Next step: run `shortgit push \"your first commit message\"` to push.')
 
 @app.command()
@@ -157,5 +164,8 @@ def push(
             raise
     typer.echo(f"Pushed branch '{br}' to origin.")
 
-def main(): app()
-if __name__ == "__main__": main()
+def main(): 
+    app()
+
+if __name__ == "__main__": 
+    main()
