@@ -39,7 +39,7 @@ def make_gitignore(repo_dir: Path, also_ignore_data_exts: bool=True, extra_patte
     lines = [
         "# Python",
         "__pycache__/", "*.py[cod]", "*.egg-info/", ".pytest_cache/", ".mypy_cache/", ".ruff_cache/",
-        ".venv/", "venv/",
+        ".venv/", "venv/","*.env","",".env.*","*.env",
         "# Build artifacts",
         "build/", "dist/",
         "# IDE",
@@ -47,13 +47,7 @@ def make_gitignore(repo_dir: Path, also_ignore_data_exts: bool=True, extra_patte
         "# Data directories",
         "**/data/**",
         "# Common data files",
-        "*.parquet","*.pq","*.feather","*.pkl","*.pickle",
-        "*.csv","*.tsv","*.txt","*.jsonl","*.json",
-        "*.dta","*.sas7bdat","*.xpt","*.sav","*.zsav",
-        "*.rds","*.RData",
-        "*.xlsx","*.xls","*.xlsm","*.xlsb",
-        "*.h5","*.hdf5",
-        "*.npz","*.npy",
+        "*.parquet",
     ]
     if extra_patterns: lines += extra_patterns
     gi.write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -108,10 +102,7 @@ def init(
         raise RuntimeError("`gh` is not authenticated. Run `gh auth login` first.") from e
 
     repo_name = name or path.name
-    args = ["gh","repo","create",repo_name,"--source",str(path),"--remote","origin"]
-    if visibility is Visibility.public: args += ["--public"]
-    elif visibility is Visibility.private: args += ["--private"]
-    else: args += ["--internal"]
+    args = ["gh","repo","create",repo_name,"--source",str(path),"--remote","origin", f"--{visibility}"]
     if description: args += ["--description", description]
     if org: args += ["--owner", org]
     run(args, cwd=path)
